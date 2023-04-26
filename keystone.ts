@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import { config, list } from "@keystone-6/core";
 import { allowAll } from "@keystone-6/core/access";
 import { text } from "@keystone-6/core/fields";

@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/keystone/context.ts", "pages/check.js", "pages/index.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/keystone/context.ts", "pages/check.js", "pages/index.ts", "components/Navbar.tsx"],
   "exclude": ["node_modules"]
 }

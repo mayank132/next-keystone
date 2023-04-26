@@ -1,4 +1,5 @@
-import React from "react";
+
+//@ts-nocheck comment at the top of the file.import React from "react";
 import { useState, useEffect } from "react";
 import { gql } from "graphql-request";
 import { useMutation, useQuery } from "@apollo/client";

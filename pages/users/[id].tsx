@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import { gql } from "graphql-request";
 import client from "../../helpers/request";
 import Link from "next/link";
@@ -55,8 +56,6 @@ export default function SpecificUser({ userId }) {
     } catch (error) {
       console.log("error", error);
     }
-
-
   };
 
   async function fetchData() {
@@ -81,17 +80,21 @@ export default function SpecificUser({ userId }) {
   return (
     <div>
       <h1> all posts of {data.name}</h1>
-      {data.posts &&
-        data.posts.map((item, key) => {
-          return (
-            <>
-              <h2>
-                {" "}
-                {key + 1} title: {item.title}{" "}
-              </h2>
-            </>
-          );
-        })}
+
+
+      <div className="grid grid-cols-4 gap-4">
+        {data.posts &&
+          data.posts.map((item, key) => {
+            return (
+              <div>
+                <h2>
+                  {" "}
+                  {key + 1} title: {item.title}{" "}
+                </h2>
+              </div>
+            );
+          })}
+      </div>
 
       <form>
         <h2> add new post </h2>

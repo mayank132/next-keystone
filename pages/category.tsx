@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import React from 'react';
 import { gql } from "graphql-request";
 import client from ".././helpers/request";

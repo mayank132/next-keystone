@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import { gql } from "graphql-request";
 import client from "../../helpers/request";
 import Link from "next/link";

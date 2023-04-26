@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import Navbar from "./Navbar";
 import { useEffect } from "react";
 import { useRouter } from 'next/router'

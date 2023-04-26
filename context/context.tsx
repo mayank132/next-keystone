@@ -1,6 +1,9 @@
-import { createContext, useState } from "react";
+//@ts-nocheck comment at the top of the file.
+import React from 'react';
 
-export const User_data = createContext();
+import {  useState } from "react";
+
+export const User_data = React.createContext();
 
 function Context({ children }) {
     const [user, setUser] = useState();

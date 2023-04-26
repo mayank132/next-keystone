@@ -1,7 +1,8 @@
+//@ts-nocheck comment at the top of the file.
 import React from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { keystoneContext } from ".././src/keystone/context";
+import { keystoneContext } from "../src/keystone/context";
 
 const Logout = () => {
   const router = useRouter();

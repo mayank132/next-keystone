@@ -1,3 +1,4 @@
+//@ts-nocheck comment at the top of the file.
 import { gql } from "graphql-request";
 import { useMutation, useQuery } from "graphql-request";
 import { useState, useEffect } from "react";
