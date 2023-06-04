@@ -23,6 +23,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/keystone/context.ts", "pages/check.js", "pages/index.ts", "components/Navbar.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/keystone/context.ts", "pages/check.js", "pages/index.ts", "components/Navbar.tsx", "components/AddUserForm.js", "src/app/timelines/page.js", "src/app/server/page.js"],
   "exclude": ["node_modules"]
 }

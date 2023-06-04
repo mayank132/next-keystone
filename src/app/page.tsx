@@ -1,7 +1,7 @@
 //@ts-nocheck comment at the top of the file.
-import React, { useEffect, useState } from "react";
+
 import { useContext } from "react";
-import { User_data } from "../context/context";
+// import { User_data } from "../context/context";
 import Link from "next/link";
 const path = require('path')
 
@@ -18,18 +18,18 @@ const path = require('path')
 
 
 const Home = () => {
-  const { user, setUser } = useContext(User_data);
+//   const { user, setUser } = useContext(User_data);
 
-  useEffect(() => {}, []);
 
-  return ( user && 
+
+  return (  
     <div>
          <p>
-            see all your posts <Link href={`/users/${user.id}`}> posts </Link>
+            see all your  <Link href={`/timeenteries`}> time enteries </Link>
           </p>
           <p>
             {" "}
-            edit <Link href={`/users/edit/${user.id}`}>{user.name}</Link>
+            {/* edit <Link href={`/users/edit/${user.id}`}>{user.name}</Link> */}
           </p>
     </div>
   );

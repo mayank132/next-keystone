@@ -15,7 +15,7 @@ const AUTHENTICATE_WITH_PASSWORD = gql`
         item {
           id
           name
-          isAdmin
+
         }
       }
       ... on UserAuthenticationWithPasswordFailure {

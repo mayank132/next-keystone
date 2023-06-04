@@ -1,4 +1,5 @@
 //@ts-nocheck comment at the top of the file.
+'use server';
 import { gql } from "graphql-request";
 import client from "../../helpers/request";
 import Link from "next/link";
@@ -10,8 +11,8 @@ const GET_USER = gql`
     user(where: { id: $id }) {
       id
       name
-      isAdmin
       posts {
+
         title
         id
       }
@@ -29,58 +30,31 @@ const ADD_USER = gql`
   }
 `;
 
-export default function SpecificUser({ userId }) {
+
+
+
+
+export default async function SpecificUser({ userId }) {
   console.log("all posts", userId);
   const [data, setData] = useState([]);
 
   const [title, setTitle] = useState("");
 
-  const addUser = async (e, id) => {
-    console.log("lemon", id);
-    e.preventDefault();
 
-    const variables = {
-      data: {
-        author: {
-          connect: {
-            id: userId,
-          },
-        },
-        title: title,
-      },
-    };
 
-    try {
-      const data = await client.request(ADD_USER, variables);
-      fetchData();
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
-
-  async function fetchData() {
-    console.log("kkkkkkkkkkkkkkkkkkk");
-    const variables = {
-      id: userId,
-    };
-
-    // You can await here
-    const data = await client.request(GET_USER, variables);
-
-    console.log("userdata", data);
-
-    setData(data.user);
-    // ...
-  }
 
   useEffect(() => {
-    fetchData();
+    // fetchData();
   }, []);
 
   return (
     <div>
       <h1> all posts of {data.name}</h1>
 
+      <form method="post">
+      <input name="name" defaultValue={'jj'} />
+      <button type="submit">submit</button>
+    </form>
 
       <div className="grid grid-cols-4 gap-4">
         {data.posts &&

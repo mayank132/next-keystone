@@ -3,6 +3,8 @@ const nextConfig = {
   
   experimental: {
     appDir: true,
+    optimizeCss: true, 
+    serverActions: true,
   },
 }
 

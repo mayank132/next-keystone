@@ -1,292 +1,61 @@
-//@ts-nocheck comment at the top of the file.
-import { config, list } from "@keystone-6/core";
-import { allowAll } from "@keystone-6/core/access";
-import { text } from "@keystone-6/core/fields";
-import {
-  relationship,
-  password,
-  image,
-  file,
-  checkbox,
-} from "@keystone-6/core/fields";
-// import { document } from '@keystone-6/fields-document';
+import { config } from "@keystone-6/core";
+import { withAuth, session } from "./auth";
+import User from "./Schemas/User";
+import Project from "./Schemas/Project";
+import Milestone from "./Schemas/Milestone";
+import Task from "./Schemas/Task";
+import TimeEntery from "./Schemas/TimeEntery";
+import File from "./Schemas/File";
 import dotenv from "dotenv";
-import { statelessSessions } from "@keystone-6/core/session";
-import { createAuth } from "@keystone-6/auth";
-// import Jimp from "jimp";
-import path from "path";
-import { type } from "os";
-import type { Lists } from ".keystone/types";
-import { collectGenerateParams } from "next/dist/build/utils";
+dotenv.config({ path: "./.env" });
+import { superAdminData } from "./seed";
+import type { Context } from ".keystone/types";
 
-// import kk from './images/demo.png'
-
-dotenv.config();
-
-const { withAuth } = createAuth({
-  listKey: "User",
-  identityField: "email",
-  secretField: "password",
-  sessionData: "isAdmin",
-});
-
-const session = statelessSessions({
-  secret: "-- EXAMPLE COOKIE SECRET; CHANGE ME --",
-});
-
-type Session = {
-  data: {
-    id: string;
-    isAdmin: boolean;
-  };
-};
-
-const isAdmin = ({ session }: { session: Session }) => {
-  console.log("m", session);
-  return session?.data.isAdmin;
-};
-
-const filterPosts = ({ session }: { session: Session }) => {
-  // if the user is an Admin, they can access all the records
-
-  console.log("mob", session);
-
-  if (session?.data.isAdmin) return true;
-  // otherwise, filter for published posts
-  return { valid: { equals: false } };
-};
-
-const lists: Lists = {
-  User: list({
-
-    access: allowAll,
-    fields: {
-      name: text({ validation: { isRequired: true } }),
-      email: text({
-        validation: { isRequired: true },
-        hooks: {
-          validateInput: ({ addValidationError, resolvedData, fieldKey }) => {
-            const email = resolvedData[fieldKey];
-            if (email !== undefined && email !== null && !email.includes("@")) {
-              addValidationError(
-                `The email address ${email} provided for the field ${fieldKey} must contain an '@' character`
-              );
-            }
-          },
-        },
-        isIndexed: "unique",
-      }),
-      posts: relationship({ ref: "Post.author", many: true }),
-      password: password({ validation: { isRequired: true } }),
-      isAdmin: checkbox(),
+export default config(
+  withAuth({
+    server: {
+      cors: { origin: ["http://localhost:4000"], credentials: true },
     },
-    hooks: {
-      beforeOperation: ({ operation, item }) => {
-        console.log("seeing", item);
-      },
-      afterOperation: ({ operation, item }) => {
-        if (operation === "create") {
-          console.log(
-            `New user created. Name: ${item.name}, Email: ${item.email}`
-          );
-        }
-      },
-    },
-  }),
-  Category: list({
-    access: {
-      operation: {
-        create: isAdmin,
-        update: isAdmin,
-        delete: isAdmin,
-      },
-      filter: {
-        query: filterPosts,
-      },
-    },
-    fields: {
-      name: text({ validation: { isRequired: true } }),
-      valid: checkbox(),
-      // email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
-      // posts: rel ationship({ ref: "Post.author", many: true }),
-      // password: password({ validation: { isRequired: true } }),
-    },
-  }),
-  Product: list({
-    access: allowAll,
-    fields: {
-      name: text({ validation: { isRequired: true } }),
-      price: text({ validation: { isRequired: true } }),
-      category: relationship({ ref: "Category", many: true }),
-      // email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
-      // posts: relationship({ ref: "Post.author", many: true }),
-      // password: password({ validation: { isRequired: true } }),
-    },
-  }),
-  Order: list({
-    access: allowAll,
-    fields: {
-      user: relationship({ ref: "User", many: false }),
-      product: relationship({ ref: "Product", many: false }),
-      // price: relationship({ ref: "Product.price", many: false }),
-      // email: text({ validation: { isRequired: true }, isIndexed: "unique" }),
-      // posts: relationship({ ref: "Post.author", many: true }),
-      // password: password({ validation: { isRequired: true } }),
-    },
-  }),
-
-  Post: list({
-    access: allowAll,
-    fields: {
-      // content: document({
-      //   relationships: {
-      //     mention: {
-      //       listKey: 'User',
-      //       label: 'Mention',
-      //       selection: 'id name',
-      //     },
-      //   },
-      //   formatting: true,
-      //   dividers: true,
-      //   links: true,
-      //   layouts: [
-      //     [1, 1],
-      //     [1, 1, 1],
-      //   ],
-      // }),
-      title: text(),
-      author: relationship({ ref: "User.posts", many: false }),
-      isComplete: checkbox(),
-      avatar: image({ storage: "my_local_images" }),
-    },
-
-    hooks: {
-      validateInput: ({ resolvedData, addValidationError }) => {
-        const { title } = resolvedData;
-        console.log("LLL", title);
-        if (title === "") {
-          // We call addValidationError to indicate an invalid value.
-          addValidationError(
-            "The title of a blog post cannot be the empty string"
-          );
-        }
-      },
-      afterOperation: ({ operation, item }) => {
-        console.log("item", item);
-        if (operation === "create" || operation === "update") {
-          console.log("item", item.avatar_id);
-
-          // Jimp.read(
-          //   `./public/images/${item.avatar_id}.${item.avatar_extension}`
-          // )
-          //   .then((lenna) => {
-          //     return lenna
-          //       .resize(360, 640) // resize
-          //       .quality(60) // set JPEG quality
-          //       .greyscale() // set greyscale
-          //       .write(
-          //         `./public/images/${new Date().getTime()}mobile.${
-          //           item.avatar_extension
-          //         }`
-          //       ); // save
-          //   })
-          //   .catch((err) => {
-          //     console.error("error", err);
-          //   });
-
-          // Jimp.read(
-          //   `./public/images/${item.avatar_id}.${item.avatar_extension}`
-          // )
-          //   .then((lenna) => {
-          //     return lenna
-          //       .resize(768, 1024) // resize
-          //       .quality(60) // set JPEG quality
-          //       .greyscale() // set greyscale
-          //       .write(
-          //         `./public/images/${new Date().getTime()}tablet.${
-          //           item.avatar_extension
-          //         }`
-          //       ); // save
-          //   })
-          //   .catch((err) => {
-          //     console.error("error", err);
-          //   });
-
-          // Jimp.read(
-          //   `./public/images/${item.avatar_id}.${item.avatar_extension}`
-          // )
-          //   .then((lenna) => {
-          //     return lenna
-          //       .resize(1920, 1080) // resize
-          //       .quality(60) // set JPEG quality
-          //       .greyscale() // set greyscale
-          //       .write(
-          //         `./public/images/${new Date().getTime()}desktop.${
-          //           item.avatar_extension
-          //         }`
-          //       ); // save
-          //   })
-          //   .catch((err) => {
-          //     console.error("error", err);
-          //   });
-        }
-      },
-      resolveInput: ({ resolvedData }) => {
-        console.log("ll");
-        const { title } = resolvedData;
-        if (title) {
-          return {
-            ...resolvedData,
-            // Ensure the first letter of the title is capitalised
-            title: title[0].toUpperCase() + title.slice(1),
-          };
-        }
-        // We always return resolvedData from the resolveInput hook
-        return resolvedData;
-      },
-    },
-  }),
-};
-
-const {
-  S3_BUCKET_NAME: bucketName = "keystone-test",
-  S3_REGION: region = "ap-southeast-2",
-  S3_ACCESS_KEY_ID: accessKeyId = "keystone",
-  S3_SECRET_ACCESS_KEY: secretAccessKey = "keystone",
-  ASSET_BASE_URL: baseUrl = "http://localhost:3000",
-} = process.env;
-
-export default withAuth(
-  config({
+    //connect to the postgress database
     db: {
       provider: "postgresql",
-      url: "postgres://postgres:welcome@localhost:5432/postgres",
+      url: process.env.PostgressUrl || "",
+      onConnect: async (context: Context) => {
+        await superAdminData(context);
+      },
     },
-    lists,
-    session,
-    server: {
-      // cors: { origin: ['http://localhost:3000'], credentials: true },
-      // port: 3000,
-      // // maxFileSize: 200 * 1024 * 1024,
-      // // healthCheck: true,
-      // extendExpressApp: (app, commonContext) => { /* ... */ },
-      // extendHttpServer: (httpServer, commonContext, graphQLSchema) => { /* ... */ },
+
+    lists: {
+      User,// Register the User list
+      Project,// Register the Project list
+      Milestone,// Register the Milestone list
+      Task,// Register the Task list
+      TimeEntery,// Register the TimeEntry list
+      File,// Register the File list
     },
     storage: {
-      // The key here will be what is referenced in the image field
       my_local_images: {
-        // Images that use this store will be stored on the local machine
         kind: "local",
-        // This store is used for the image field type
         type: "image",
-        // The URL that is returned in the Keystone GraphQL API
-        generateUrl: (path) => `${baseUrl}/images${path}`,
-        // The route that will be created in Keystone's backend to serve the images
+        generateUrl: (path) => `http://localhost:3000/images${path}`,
         serverRoute: {
           path: "/images",
         },
         storagePath: "public/images",
       },
+      my_local_file: {
+        kind: "local",
+        type: "file",
+        generateUrl: (path) => `http://localhost:3000/file${path}`,
+        serverRoute: {
+          path: "/file",
+        },
+        storagePath: "public/file",
+      },
+    },
+    session,// Use the session configuration from the "auth" module
+    ui: {
+      isAccessAllowed: (context: any) => !!context.session?.data,
     },
   })
 );
